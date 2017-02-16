@@ -5,7 +5,7 @@ AlphaBooster 에서 CSV file 을 직접 읽어서 Array 저장 후 Lookup 하기
 
 # [UDF.BAS](https://github.com/MillimanKorea/VBAUtils/blob/master/UDF.bas)
 
-1. Function VLookup
+1. **Function VLookup**
  + VLookup Function : 반환값은 반드시 Double type
  + 1st 파라미터(TargetKey) : 찾고자 하는 Key 값
  + 2nd 파라미터(KeyArray()) : Source Array 중 Key 배열
