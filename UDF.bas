@@ -1,3 +1,4 @@
+Attribute VB_Name = "UDF"
 Option Explicit
 
 
@@ -33,9 +34,14 @@ Public Function VLookup(ByVal Target As String, SourceArray() As String, ByVal F
     Dim RecArray() As String
     Dim Adj As Long: Adj = 10
     Dim Key() As String
-    Dim NumRow As Long
+    Dim NumRow As Long, NumCol As Long
     
     NumRow = CLng(SourceArray(2))
+    NumCol = CLng(SourceArray(3))
+    If FieldNum > NumCol Then
+        Debug.Print "¹è¿­ÀÇ ÄÃ·³ °¹¼öº¸´Ù Å« ÇÊµå¹øÈ£°¡ ÀÔ·ÂµÇ¾ú½À´Ï´Ù."
+        Exit Function
+    End If
     
     For i = 1 + Adj To NumRow + Adj
         If SourceArray(i) <> "" Then
@@ -47,6 +53,10 @@ Public Function VLookup(ByVal Target As String, SourceArray() As String, ByVal F
             End If
         End If
     Next i
+    
+    If i > NumRow + Adj Then
+        Debug.Print Target & " ¿¡ ÇØ´çÇÏ´Â ·¹ÄÚµå°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù."
+    End If
     
 End Function
 
@@ -70,6 +80,10 @@ Public Function VLookupAll(ByVal Target As String, SourceArray() As String) As S
             End If
         End If
     Next i
+    'Target ¿¡ ÇØ´çµÇ´Â ÇÊµå°¡ Á¸ÀçÇÏÁö ¾Ê´Â °æ¿ì error message Ç¥½Ã
+    If i > NumRow + Adj Then
+        Debug.Print Target & " ¿¡ ÇØ´çÇÏ´Â ·¹ÄÚµå°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù."
+    End If
     
 End Function
 
@@ -86,16 +100,21 @@ Public Function HLookupAll(ByVal Target As String, SourceArray() As String) As S
     
     NumRow = CLng(SourceArray(2))
     
-    'ì²«ë²ˆì§¸ ë¼ì¸ Split
+    'Ã¹¹øÂ° ¶óÀÎ Split
     RecArray = Split(SourceArray(0), ",")
     
-    'Target ì— í•´ë‹¹í•˜ëŠ” ì»¬ëŸ¼ì˜ ì¸ë±ìŠ¤ ì°¾ê¸°
+    'Target ¿¡ ÇØ´çÇÏ´Â ÄÃ·³ÀÇ ÀÎµ¦½º Ã£±â
     For i = 0 To UBound(RecArray())
         If RecArray(i) = Target Then
             TargetColNum = i + 1
             Exit For
         End If
     Next i
+    'Target ¿¡ ÇØ´çµÇ´Â ÇÊµå°¡ Á¸ÀçÇÏÁö ¾Ê´Â °æ¿ì error message Ç¥½Ã ÈÄ Á¾·á
+    If i > UBound(RecArray()) Then
+        Debug.Print Target & " ¿¡ ÇØ´çÇÏ´Â ÇÊµå°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù."
+        Exit Function
+    End If
     
     For i = 1 + Adj To NumRow + Adj
         If SourceArray(i) <> "" Then
@@ -135,27 +154,27 @@ Public Sub CSVImport(ByVal CSVFileName As String, _
     If KeyColStr = "" Then KeyColStr = "1"
     ColKey = Split(KeyColStr, ",")
     
-    'ë°ì´í„°ëŠ” index 11 ë¶€í„° ë„£ê¸° ì‹œì‘í•¨
-    'ì•ìª½ 0~10 ê¹Œì§€ì˜ 11ê°œ ê³µê°„ì€ ë°°ì—´ì— ëŒ€í•œ ì •ë³´ë¥¼ ë„£ëŠ” ê³µê°„ìœ¼ë¡œ ì‚¬ìš©ë¨
+    'µ¥ÀÌÅÍ´Â index 11 ºÎÅÍ ³Ö±â ½ÃÀÛÇÔ
+    '¾ÕÂÊ 0~10 ±îÁöÀÇ 11°³ °ø°£Àº ¹è¿­¿¡ ´ëÇÑ Á¤º¸¸¦ ³Ö´Â °ø°£À¸·Î »ç¿ëµÊ
     NumRow = 10
                 
-    'íŒŒì¼ ëê¹Œì§€ ë°˜ë³µí•´ì„œ ì½ì–´ë“¤ì´ê¸°
+    'ÆÄÀÏ ³¡±îÁö ¹İº¹ÇØ¼­ ÀĞ¾îµéÀÌ±â
     Do While Not EOF(fnr)
-        'í•œì¤„ì”© ì½ì–´ë“¤ì—¬ì„œ S ì— ì €ì¥
+        'ÇÑÁÙ¾¿ ÀĞ¾îµé¿©¼­ S ¿¡ ÀúÀå
         Line Input #fnr, S
         
-        'ì½ì–´ë“¤ì´ëŠ” ë ˆì½”ë“œ ì¹´ìš´íŠ¸
+        'ÀĞ¾îµéÀÌ´Â ·¹ÄÚµå Ä«¿îÆ®
         RecCount = RecCount + 1
 
-        'ë°°ì—´ S ì— ì €ì¥ëœ ë‚´ìš©ì„ comma ê¸°ì¤€ìœ¼ë¡œ ë¶„ë¦¬
+        '¹è¿­ S ¿¡ ÀúÀåµÈ ³»¿ëÀ» comma ±âÁØÀ¸·Î ºĞ¸®
         RecArray = Split(S, ",")
 
-        'ì»¬ëŸ¼ ë³€ìˆ˜ëª… ì €ì¥ í›„ Field ë°°ì—´ë¡œ ë°˜í™˜
+        'ÄÃ·³ º¯¼ö¸í ÀúÀå ÈÄ Field ¹è¿­·Î ¹İÈ¯
         If RecCount = 1 Then
             ResultArray(0) = S
         End If
         
-        'ì •ì˜ëœ Field ê°¯ìˆ˜ë¥¼ NumCol ì— ì €ì¥ í›„ ë°˜í™˜
+        'Á¤ÀÇµÈ Field °¹¼ö¸¦ NumCol ¿¡ ÀúÀå ÈÄ ¹İÈ¯
         If RecCount = 2 Then
             NumCol = UBound(RecArray) + 1
             For i = 1 To NumCol
@@ -167,11 +186,11 @@ Public Sub CSVImport(ByVal CSVFileName As String, _
             Next i
         End If
 
-        'ë°ì´í„° íŒŒì¼ ì •ë³´ë¥¼ ë‹´ê³  ìˆëŠ” ì²˜ìŒ 3ë¼ì¸ì„ ì½ì€ ì´í›„, ì¦‰, ë°ì´í„° ê°’ ì²˜ë¦¬ ë¶€ë¶„
+        'µ¥ÀÌÅÍ ÆÄÀÏ Á¤º¸¸¦ ´ã°í ÀÖ´Â Ã³À½ 3¶óÀÎÀ» ÀĞÀº ÀÌÈÄ, Áï, µ¥ÀÌÅÍ °ª Ã³¸® ºÎºĞ
         If RecCount > 3 Then
             NumRow = NumRow + 1
             
-            'Key ë°°ì—´ ì¡°í•©í•´ì„œ ìƒì„± - MaxKeyNum ë§Œí¼ ë°˜ë³µ
+            'Key ¹è¿­ Á¶ÇÕÇØ¼­ »ı¼º - MaxKeyNum ¸¸Å­ ¹İº¹
             For i = 0 To UBound(ColKey)
                 For j = 1 To NumCol
                     If CLng(ColKey(i)) = j And i = 0 Then
@@ -182,7 +201,7 @@ Public Sub CSVImport(ByVal CSVFileName As String, _
                 Next j
             Next i
         
-            'ë°ì´í„° ì €ì¥
+            'µ¥ÀÌÅÍ ÀúÀå
             ResultArray(NumRow) = ResultArray(NumRow) & "|" & S
             
         End If
@@ -196,3 +215,4 @@ Public Sub CSVImport(ByVal CSVFileName As String, _
     ResultArray(3) = NumCol
     
 End Sub
+
