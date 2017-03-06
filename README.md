@@ -1,7 +1,8 @@
-# VBA Utils
+# CSV Access
 
-AlphaBooster 에서 CSV file 을 직접 읽어서 Array 저장 후 Lookup 하기 위한 Code
+AlphaBooster 에서 CSV file 을 직접 읽어서 Array 저장 후 Lookup 하기 위한 VBA Code
 
+# ![CSV Access Process](https://raw.githubusercontent.com/MillimanKorea/CSVAccess/master/CSVAccess.png)
 
 # [UDF.BAS](https://github.com/MillimanKorea/VBAUtils/blob/master/UDF.bas)
 
