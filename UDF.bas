@@ -27,7 +27,7 @@ Public Function JoinArray(ByRef SourceArray() As String, ByVal NumRow As Long) A
 
 End Function
 
-Public Function Lookup(ByVal TargetRow As String, ByVal TargetCol As String, SourceArray() As String) As String
+Public Function Lookup(ByVal TargetRow As String, SourceArray() As String, ByVal TargetCol As String) As String
 
     Dim i As Long
     Dim RecArray() As String, DataArray() As String
