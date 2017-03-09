@@ -27,6 +27,7 @@ Public Function JoinArray(ByRef SourceArray() As String, ByVal NumRow As Long) A
 
 End Function
 
+
 Public Function Lookup(ByVal TargetRow As String, SourceArray() As String, ByVal TargetCol As String) As String
 
     Dim i As Long
@@ -35,71 +36,90 @@ Public Function Lookup(ByVal TargetRow As String, SourceArray() As String, ByVal
     Dim TempStr As String: TempStr = ""
     Dim Adj As Long: Adj = 10
     Dim NumRow As Long
-    
+
     NumRow = CLng(SourceArray(2))
-    
-    'ì²«ë²ˆì§¸ ë¼ì¸ Split
+
+    'Ã¹¹øÂ° ¶óÀÎ Split
     RecArray = Split(SourceArray(0), ",")
-    
-    'TargetCol ì— í•´ë‹¹í•˜ëŠ” ì»¬ëŸ¼ì˜ ì¸ë±ìŠ¤ ì°¾ê¸°
+
+    'TargetCol ¿¡ ÇØ´çÇÏ´Â ÄÃ·³ÀÇ ÀÎµ¦½º Ã£±â
     For i = 0 To UBound(RecArray())
         If RecArray(i) = TargetCol Then
             TargetColNum = i + 1
             Exit For
         End If
     Next i
-    'TargetCol ì— í•´ë‹¹ë˜ëŠ” í•„ë“œê°€ ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ê²½ìš° error message í‘œì‹œ í›„ ì¢…ë£Œ
+
+    'TargetCol ¿¡ ÇØ´çµÇ´Â ÇÊµå°¡ Á¸ÀçÇÏÁö ¾Ê´Â °æ¿ì error message Ç¥½Ã ÈÄ Á¾·á
     If i > UBound(RecArray()) Then
-        Debug.Print TargetCol & " ì— í•´ë‹¹í•˜ëŠ” í•„ë“œê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤."
+        Debug.Print TargetCol & " ¿¡ ÇØ´çÇÏ´Â ÇÊµå°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù."
         Exit Function
     End If
-    
-    For i = 1 + Adj To NumRow + Adj
-        If SourceArray(i) <> "" Then
-            RecArray = Split(SourceArray(i), "|")
-            If RecArray(0) = TargetRow Then
-                RecArray = Split(RecArray(1), ",")
-                Lookup = RecArray(TargetColNum - 1)
-                Exit For
+
+    If SourceArray(4) = "NotSorted" Then
+        '¼øÂ÷°Ë»ö
+        For i = 1 + Adj To NumRow + Adj
+            If SourceArray(i) <> "" Then
+                RecArray = Split(SourceArray(i), "|")
+                If RecArray(0) = TargetRow Then
+                    RecArray = Split(RecArray(1), ",")
+                    Lookup = RecArray(TargetColNum - 1)
+                    Exit For
+                End If
             End If
-        End If
-    Next i
-    'TargetRow ì— í•´ë‹¹ë˜ëŠ” í•„ë“œê°€ ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ê²½ìš° error message í‘œì‹œ
-    If i > NumRow + Adj Then
-        Debug.Print TargetRow & " ì— í•´ë‹¹í•˜ëŠ” ë ˆì½”ë“œê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤."
-    End If
+        Next i
     
+        'TargetRow ¿¡ ÇØ´çµÇ´Â ÇÊµå°¡ Á¸ÀçÇÏÁö ¾Ê´Â °æ¿ì error message Ç¥½Ã
+        If i > NumRow + Adj Then
+            Debug.Print TargetRow & " ¿¡ ÇØ´çÇÏ´Â ·¹ÄÚµå°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù."
+        End If
+    Else
+        'ÀÌÁø°Ë»ö
+        i = BinSearch(SourceArray, TargetRow, 11, 11 + NumRow)
+        RecArray = Split(SourceArray(i), "|")
+        RecArray = Split(RecArray(1), ",")
+        Lookup = RecArray(TargetColNum - 1)
+    End If
+
 End Function
 
 
-Public Function VLookup(ByVal Target As String, SourceArray() As String, ByVal FieldNum As Long) As String
+Public Function VLookup(ByVal TargetRow As String, SourceArray() As String, ByVal FieldNum As Long) As String
     
     Dim i As Long
     Dim RecArray() As String
     Dim Adj As Long: Adj = 10
-    Dim Key() As String
     Dim NumRow As Long, NumCol As Long
     
     NumRow = CLng(SourceArray(2))
     NumCol = CLng(SourceArray(3))
     If FieldNum > NumCol Then
-        Debug.Print "ë°°ì—´ì˜ ì»¬ëŸ¼ ê°¯ìˆ˜ë³´ë‹¤ í° í•„ë“œë²ˆí˜¸ê°€ ì…ë ¥ë˜ì—ˆìŠµë‹ˆë‹¤."
+        Debug.Print "¹è¿­ÀÇ ÄÃ·³ °¹¼öº¸´Ù Å« ÇÊµå¹øÈ£°¡ ÀÔ·ÂµÇ¾ú½À´Ï´Ù."
         Exit Function
     End If
     
-    For i = 1 + Adj To NumRow + Adj
-        If SourceArray(i) <> "" Then
-            Key = Split(SourceArray(i), "|")
-            If Key(0) = Target Then
-                RecArray = Split(SourceArray(i), ",")
-                VLookup = RecArray(FieldNum - 1)
-                Exit Function
+    If SourceArray(4) = "NotSorted" Then
+        '¼øÂ÷°Ë»ö
+        For i = 1 + Adj To NumRow + Adj
+            If SourceArray(i) <> "" Then
+                RecArray = Split(SourceArray(i), "|")
+                If RecArray(0) = TargetRow Then
+                    RecArray = Split(RecArray(1), ",")
+                    VLookup = RecArray(FieldNum - 1)
+                    Exit Function
+                End If
             End If
+        Next i
+        
+        If i > NumRow + Adj Then
+            Debug.Print TargetRow & " ¿¡ ÇØ´çÇÏ´Â ·¹ÄÚµå°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù."
         End If
-    Next i
-    
-    If i > NumRow + Adj Then
-        Debug.Print Target & " ì— í•´ë‹¹í•˜ëŠ” ë ˆì½”ë“œê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤."
+    Else
+        'ÀÌÁø°Ë»ö
+        i = BinSearch(SourceArray, TargetRow, 11, 11 + NumRow)
+        RecArray = Split(SourceArray(i), "|")
+        RecArray = Split(RecArray(1), ",")
+        VLookup = RecArray(FieldNum - 1)
     End If
     
 End Function
@@ -110,23 +130,31 @@ Public Function VLookupAll(ByVal Target As String, SourceArray() As String) As S
     
     Dim i As Long
     Dim Adj As Long: Adj = 10
-    Dim Key() As String
+    Dim RecArray() As String
     Dim NumRow As Long
     
     NumRow = CLng(SourceArray(2))
     
-    For i = 1 + Adj To NumRow + Adj
-        If SourceArray(i) <> "" Then
-            Key = Split(SourceArray(i), "|")
-            If Key(0) = Target Then
-                VLookupAll = Key(1)
-                Exit Function
+    If SourceArray(4) = "NotSorted" Then
+        '¼øÂ÷°Ë»ö
+        For i = 1 + Adj To NumRow + Adj
+            If SourceArray(i) <> "" Then
+                RecArray = Split(SourceArray(i), "|")
+                If RecArray(0) = Target Then
+                    VLookupAll = RecArray(1)
+                    Exit Function
+                End If
             End If
+        Next i
+        'Target ¿¡ ÇØ´çµÇ´Â ÇÊµå°¡ Á¸ÀçÇÏÁö ¾Ê´Â °æ¿ì error message Ç¥½Ã
+        If i > NumRow + Adj Then
+            Debug.Print Target & " ¿¡ ÇØ´çÇÏ´Â ·¹ÄÚµå°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù."
         End If
-    Next i
-    'Target ì— í•´ë‹¹ë˜ëŠ” í•„ë“œê°€ ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ê²½ìš° error message í‘œì‹œ
-    If i > NumRow + Adj Then
-        Debug.Print Target & " ì— í•´ë‹¹í•˜ëŠ” ë ˆì½”ë“œê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤."
+    Else
+        'ÀÌÁø°Ë»ö
+        i = BinSearch(SourceArray, Target, 11, 11 + NumRow)
+        RecArray = Split(SourceArray(i), "|")
+        VLookupAll = RecArray(1)
     End If
     
 End Function
@@ -144,19 +172,19 @@ Public Function HLookupAll(ByVal Target As String, SourceArray() As String) As S
     
     NumRow = CLng(SourceArray(2))
     
-    'ì²«ë²ˆì§¸ ë¼ì¸ Split
+    'Ã¹¹øÂ° ¶óÀÎ Split
     RecArray = Split(SourceArray(0), ",")
     
-    'Target ì— í•´ë‹¹í•˜ëŠ” ì»¬ëŸ¼ì˜ ì¸ë±ìŠ¤ ì°¾ê¸°
+    'Target ¿¡ ÇØ´çÇÏ´Â ÄÃ·³ÀÇ ÀÎµ¦½º Ã£±â
     For i = 0 To UBound(RecArray())
         If RecArray(i) = Target Then
             TargetColNum = i + 1
             Exit For
         End If
     Next i
-    'Target ì— í•´ë‹¹ë˜ëŠ” í•„ë“œê°€ ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ê²½ìš° error message í‘œì‹œ í›„ ì¢…ë£Œ
+    'Target ¿¡ ÇØ´çµÇ´Â ÇÊµå°¡ Á¸ÀçÇÏÁö ¾Ê´Â °æ¿ì error message Ç¥½Ã ÈÄ Á¾·á
     If i > UBound(RecArray()) Then
-        Debug.Print Target & " ì— í•´ë‹¹í•˜ëŠ” í•„ë“œê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤."
+        Debug.Print Target & " ¿¡ ÇØ´çÇÏ´Â ÇÊµå°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù."
         Exit Function
     End If
     
@@ -174,9 +202,7 @@ End Function
 
 
 
-Public Sub CSVImport(ByVal CSVFileName As String, _
-                     ByRef ResultArray() As String, _
-                     ByRef KeyColStr As String)
+Public Sub CSVImport(ByVal CSVFileName As String, ByRef CSVArray() As String, ByRef KeyColStr As String, ByVal SortFlag As Integer)
 
     Dim S As String
     Dim fnr As Long
@@ -198,55 +224,55 @@ Public Sub CSVImport(ByVal CSVFileName As String, _
     If KeyColStr = "" Then KeyColStr = "1"
     ColKey = Split(KeyColStr, ",")
     
-    'ë°ì´í„°ëŠ” index 11 ë¶€í„° ë„£ê¸° ì‹œì‘í•¨
-    'ì•ìª½ 0~10 ê¹Œì§€ì˜ 11ê°œ ê³µê°„ì€ ë°°ì—´ì— ëŒ€í•œ ì •ë³´ë¥¼ ë„£ëŠ” ê³µê°„ìœ¼ë¡œ ì‚¬ìš©ë¨
+    'µ¥ÀÌÅÍ´Â index 11 ºÎÅÍ ³Ö±â ½ÃÀÛÇÔ
+    '¾ÕÂÊ 0~10 ±îÁöÀÇ 11°³ °ø°£Àº ¹è¿­¿¡ ´ëÇÑ Á¤º¸¸¦ ³Ö´Â °ø°£À¸·Î »ç¿ëµÊ
     NumRow = 10
                 
-    'íŒŒì¼ ëê¹Œì§€ ë°˜ë³µí•´ì„œ ì½ì–´ë“¤ì´ê¸°
+    'ÆÄÀÏ ³¡±îÁö ¹İº¹ÇØ¼­ ÀĞ¾îµéÀÌ±â
     Do While Not EOF(fnr)
-        'í•œì¤„ì”© ì½ì–´ë“¤ì—¬ì„œ S ì— ì €ì¥
+        'ÇÑÁÙ¾¿ ÀĞ¾îµé¿©¼­ S ¿¡ ÀúÀå
         Line Input #fnr, S
         
-        'ì½ì–´ë“¤ì´ëŠ” ë ˆì½”ë“œ ì¹´ìš´íŠ¸
+        'ÀĞ¾îµéÀÌ´Â ·¹ÄÚµå Ä«¿îÆ®
         RecCount = RecCount + 1
 
-        'ë°°ì—´ S ì— ì €ì¥ëœ ë‚´ìš©ì„ comma ê¸°ì¤€ìœ¼ë¡œ ë¶„ë¦¬
+        '¹è¿­ S ¿¡ ÀúÀåµÈ ³»¿ëÀ» comma ±âÁØÀ¸·Î ºĞ¸®
         RecArray = Split(S, ",")
 
-        'ì»¬ëŸ¼ ë³€ìˆ˜ëª… ì €ì¥ í›„ Field ë°°ì—´ë¡œ ë°˜í™˜
+        'ÄÃ·³ º¯¼ö¸í ÀúÀå ÈÄ Field ¹è¿­·Î ¹İÈ¯
         If RecCount = 1 Then
-            ResultArray(0) = S
+            CSVArray(0) = S
         End If
         
-        'ì •ì˜ëœ Field ê°¯ìˆ˜ë¥¼ NumCol ì— ì €ì¥ í›„ ë°˜í™˜
+        'Á¤ÀÇµÈ Field °¹¼ö¸¦ NumCol ¿¡ ÀúÀå ÈÄ ¹İÈ¯
         If RecCount = 2 Then
             NumCol = UBound(RecArray) + 1
             For i = 1 To NumCol
                 If i = 1 Then
-                    ResultArray(1) = Left(RecArray(i - 1), 1)
+                    CSVArray(1) = Left(RecArray(i - 1), 1)
                 Else
-                    ResultArray(1) = ResultArray(1) & "," & Left(RecArray(i - 1), 1)
+                    CSVArray(1) = CSVArray(1) & "," & Left(RecArray(i - 1), 1)
                 End If
             Next i
         End If
 
-        'ë°ì´í„° íŒŒì¼ ì •ë³´ë¥¼ ë‹´ê³  ìˆëŠ” ì²˜ìŒ 3ë¼ì¸ì„ ì½ì€ ì´í›„, ì¦‰, ë°ì´í„° ê°’ ì²˜ë¦¬ ë¶€ë¶„
+        'µ¥ÀÌÅÍ ÆÄÀÏ Á¤º¸¸¦ ´ã°í ÀÖ´Â Ã³À½ 3¶óÀÎÀ» ÀĞÀº ÀÌÈÄ, Áï, µ¥ÀÌÅÍ °ª Ã³¸® ºÎºĞ
         If RecCount > 3 Then
             NumRow = NumRow + 1
             
-            'Key ë°°ì—´ ì¡°í•©í•´ì„œ ìƒì„± - MaxKeyNum ë§Œí¼ ë°˜ë³µ
+            'Key ¹è¿­ Á¶ÇÕÇØ¼­ »ı¼º - MaxKeyNum ¸¸Å­ ¹İº¹
             For i = 0 To UBound(ColKey)
                 For j = 1 To NumCol
                     If CLng(ColKey(i)) = j And i = 0 Then
-                        ResultArray(NumRow) = RecArray(i)
+                        CSVArray(NumRow) = RecArray(i)
                     ElseIf CLng(ColKey(i)) = j And CLng(ColKey(i)) <> 0 Then
-                        ResultArray(NumRow) = ResultArray(NumRow) & "_" & RecArray(i)
+                        CSVArray(NumRow) = CSVArray(NumRow) & "_" & RecArray(i)
                     End If
                 Next j
             Next i
         
-            'ë°ì´í„° ì €ì¥
-            ResultArray(NumRow) = ResultArray(NumRow) & "|" & S
+            'µ¥ÀÌÅÍ ÀúÀå
+            CSVArray(NumRow) = CSVArray(NumRow) & "|" & S
             
         End If
 
@@ -255,8 +281,124 @@ Public Sub CSVImport(ByVal CSVFileName As String, _
     'file close
     Close fnr
     
-    ResultArray(2) = NumRow
-    ResultArray(3) = NumCol
+    CSVArray(2) = NumRow
+    CSVArray(3) = NumCol
+    
+    If SortFlag = 1 Then
+        CSVArray(4) = "Sorted"
+        Call QuickSort(CSVArray, 11, 11 + NumRow)
+    Else
+        CSVArray(4) = "NotSorted"
+    End If
     
 End Sub
+
+
+Public Sub QuickSort(ByRef SrcArray() As String, ByVal min As Integer, ByVal max As Long)
+    
+    Dim med_value As String
+    Dim hi As Long
+    Dim lo As Long
+    Dim i As Long
+    Dim j As Long, k As Long
+        
+    If max <= min Then Exit Sub
+    
+    i = Int((max - min + 1) * 0.5 + min)
+    med_value = SrcArray(i)
+    SrcArray(i) = SrcArray(min)
+    
+    lo = min
+    hi = max
+    
+    For j = 1 To max
+        
+        For k = hi To lo Step -1
+            If SrcArray(k) < med_value Or k <= lo Then
+                hi = k
+                Exit For
+            End If
+        Next k
+'        Do While List(hi) >= med_value
+'            hi = hi - 1
+'            If hi <= lo Then Exit For
+'        Loop
+     
+        If hi <= lo Then
+            SrcArray(lo) = med_value
+            Exit For
+        End If
+    
+        SrcArray(lo) = SrcArray(hi)
+        lo = lo + 1
+     
+        For k = lo To hi
+            If SrcArray(lo) >= med_value Or lo >= hi Then
+                lo = k
+                Exit For
+            End If
+        Next k
+'        Do While List(lo) < med_value
+'            lo = lo + 1
+'            If lo >= hi Then Exit For
+'        Loop
+     
+        If lo >= hi Then
+            lo = hi
+            SrcArray(hi) = med_value
+            Exit For
+        End If
+     
+        ' Swap the lo and hi values.
+        SrcArray(hi) = SrcArray(lo)
+    Next j
+    
+    Call QuickSort(SrcArray(), min, lo - 1)
+    Call QuickSort(SrcArray(), lo + 1, max)
+
+End Sub
+
+
+Function BinSearch(ByRef SrcArray() As String, ByVal Target As String, ByVal min As Long, ByVal max As Long) As Long
+    
+    Dim low As Long: low = min
+    Dim high As Long: high = max
+    Dim i As Long
+    Dim j As Long
+    Dim SrcRec() As String
+    Dim SrcData As String
+    
+    For j = min To max
+        i = (low + high) / 2
+        SrcRec = Split(SrcArray(i), "|")
+        SrcData = SrcRec(0)
+        If Target = SrcData Then
+            BinSearch = i
+            Exit For
+        ElseIf Target < SrcData Then
+            high = (i - 1)
+        Else
+            low = (i + 1)
+        End If
+        If low > high Then
+            Exit For
+        End If
+    Next j
+'    Do While low <= high
+'        i = (low + high) / 2
+'        If Target = List(i) Then
+'            BinSearch = i
+'            Exit For
+'        ElseIf Target < List(i) Then
+'            high = (i - 1)
+'        Else
+'            low = (i + 1)
+'        End If
+'    Loop
+    
+    If BinSearch = 0 Then
+        BinSearch = 0
+    End If
+
+End Function
 
