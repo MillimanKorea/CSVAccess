@@ -3,7 +3,7 @@
 + AlphaBooster 에서 CSV file 을 직접 읽어서 Array 저장 후 Lookup 하기 위한 VBA Code
 + CSVImport 에서 Sort 실행옵션을 주면 배열을 Quick Sort 로 정렬
 + 배열이 정렬되어있으면 Lookup / VLookup / VLookupAll 호출시에 Binary Search 로 검색 작업 자동 실행
-+ 배열이 정렬되어있지 않으면 순차검색
++ 배열이 정렬되어있지않으면 순차검색
 
 
 # 작동 프로세스 및 구조
