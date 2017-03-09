@@ -27,6 +27,50 @@ Public Function JoinArray(ByRef SourceArray() As String, ByVal NumRow As Long) A
 
 End Function
 
+Public Function Lookup(ByVal TargetRow As String, SourceArray() As String, ByVal TargetCol As String) As String
+
+    Dim i As Long
+    Dim RecArray() As String, DataArray() As String
+    Dim TargetColNum As Long
+    Dim TempStr As String: TempStr = ""
+    Dim Adj As Long: Adj = 10
+    Dim NumRow As Long
+    
+    NumRow = CLng(SourceArray(2))
+    
+    'ì²«ë²ˆì§¸ ë¼ì¸ Split
+    RecArray = Split(SourceArray(0), ",")
+    
+    'TargetCol ì— í•´ë‹¹í•˜ëŠ” ì»¬ëŸ¼ì˜ ì¸ë±ìŠ¤ ì°¾ê¸°
+    For i = 0 To UBound(RecArray())
+        If RecArray(i) = TargetCol Then
+            TargetColNum = i + 1
+            Exit For
+        End If
+    Next i
+    'TargetCol ì— í•´ë‹¹ë˜ëŠ” í•„ë“œê°€ ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ê²½ìš° error message í‘œì‹œ í›„ ì¢…ë£Œ
+    If i > UBound(RecArray()) Then
+        Debug.Print TargetCol & " ì— í•´ë‹¹í•˜ëŠ” í•„ë“œê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤."
+        Exit Function
+    End If
+    
+    For i = 1 + Adj To NumRow + Adj
+        If SourceArray(i) <> "" Then
+            RecArray = Split(SourceArray(i), "|")
+            If RecArray(0) = TargetRow Then
+                RecArray = Split(RecArray(1), ",")
+                Lookup = RecArray(TargetColNum - 1)
+                Exit For
+            End If
+        End If
+    Next i
+    'TargetRow ì— í•´ë‹¹ë˜ëŠ” í•„ë“œê°€ ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ê²½ìš° error message í‘œì‹œ
+    If i > NumRow + Adj Then
+        Debug.Print TargetRow & " ì— í•´ë‹¹í•˜ëŠ” ë ˆì½”ë“œê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤."
+    End If
+    
+End Function
+
 
 Public Function VLookup(ByVal Target As String, SourceArray() As String, ByVal FieldNum As Long) As String
     
@@ -39,7 +83,7 @@ Public Function VLookup(ByVal Target As String, SourceArray() As String, ByVal F
     NumRow = CLng(SourceArray(2))
     NumCol = CLng(SourceArray(3))
     If FieldNum > NumCol Then
-        Debug.Print "¹è¿­ÀÇ ÄÃ·³ °¹¼öº¸´Ù Å« ÇÊµå¹øÈ£°¡ ÀÔ·ÂµÇ¾ú½À´Ï´Ù."
+        Debug.Print "ë°°ì—´ì˜ ì»¬ëŸ¼ ê°¯ìˆ˜ë³´ë‹¤ í° í•„ë“œë²ˆí˜¸ê°€ ì…ë ¥ë˜ì—ˆìŠµë‹ˆë‹¤."
         Exit Function
     End If
     
@@ -55,7 +99,7 @@ Public Function VLookup(ByVal Target As String, SourceArray() As String, ByVal F
     Next i
     
     If i > NumRow + Adj Then
-        Debug.Print Target & " ¿¡ ÇØ´çÇÏ´Â ·¹ÄÚµå°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù."
+        Debug.Print Target & " ì— í•´ë‹¹í•˜ëŠ” ë ˆì½”ë“œê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤."
     End If
     
 End Function
@@ -80,9 +124,9 @@ Public Function VLookupAll(ByVal Target As String, SourceArray() As String) As S
             End If
         End If
     Next i
-    'Target ¿¡ ÇØ´çµÇ´Â ÇÊµå°¡ Á¸ÀçÇÏÁö ¾Ê´Â °æ¿ì error message Ç¥½Ã
+    'Target ì— í•´ë‹¹ë˜ëŠ” í•„ë“œê°€ ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ê²½ìš° error message í‘œì‹œ
     If i > NumRow + Adj Then
-        Debug.Print Target & " ¿¡ ÇØ´çÇÏ´Â ·¹ÄÚµå°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù."
+        Debug.Print Target & " ì— í•´ë‹¹í•˜ëŠ” ë ˆì½”ë“œê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤."
     End If
     
 End Function
@@ -100,19 +144,19 @@ Public Function HLookupAll(ByVal Target As String, SourceArray() As String) As S
     
     NumRow = CLng(SourceArray(2))
     
-    'Ã¹¹øÂ° ¶óÀÎ Split
+    'ì²«ë²ˆì§¸ ë¼ì¸ Split
     RecArray = Split(SourceArray(0), ",")
     
-    'Target ¿¡ ÇØ´çÇÏ´Â ÄÃ·³ÀÇ ÀÎµ¦½º Ã£±â
+    'Target ì— í•´ë‹¹í•˜ëŠ” ì»¬ëŸ¼ì˜ ì¸ë±ìŠ¤ ì°¾ê¸°
     For i = 0 To UBound(RecArray())
         If RecArray(i) = Target Then
             TargetColNum = i + 1
             Exit For
         End If
     Next i
-    'Target ¿¡ ÇØ´çµÇ´Â ÇÊµå°¡ Á¸ÀçÇÏÁö ¾Ê´Â °æ¿ì error message Ç¥½Ã ÈÄ Á¾·á
+    'Target ì— í•´ë‹¹ë˜ëŠ” í•„ë“œê°€ ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ê²½ìš° error message í‘œì‹œ í›„ ì¢…ë£Œ
     If i > UBound(RecArray()) Then
-        Debug.Print Target & " ¿¡ ÇØ´çÇÏ´Â ÇÊµå°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù."
+        Debug.Print Target & " ì— í•´ë‹¹í•˜ëŠ” í•„ë“œê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤."
         Exit Function
     End If
     
@@ -154,27 +198,27 @@ Public Sub CSVImport(ByVal CSVFileName As String, _
     If KeyColStr = "" Then KeyColStr = "1"
     ColKey = Split(KeyColStr, ",")
     
-    'µ¥ÀÌÅÍ´Â index 11 ºÎÅÍ ³Ö±â ½ÃÀÛÇÔ
-    '¾ÕÂÊ 0~10 ±îÁöÀÇ 11°³ °ø°£Àº ¹è¿­¿¡ ´ëÇÑ Á¤º¸¸¦ ³Ö´Â °ø°£À¸·Î »ç¿ëµÊ
+    'ë°ì´í„°ëŠ” index 11 ë¶€í„° ë„£ê¸° ì‹œì‘í•¨
+    'ì•ìª½ 0~10 ê¹Œì§€ì˜ 11ê°œ ê³µê°„ì€ ë°°ì—´ì— ëŒ€í•œ ì •ë³´ë¥¼ ë„£ëŠ” ê³µê°„ìœ¼ë¡œ ì‚¬ìš©ë¨
     NumRow = 10
                 
-    'ÆÄÀÏ ³¡±îÁö ¹İº¹ÇØ¼­ ÀĞ¾îµéÀÌ±â
+    'íŒŒì¼ ëê¹Œì§€ ë°˜ë³µí•´ì„œ ì½ì–´ë“¤ì´ê¸°
     Do While Not EOF(fnr)
-        'ÇÑÁÙ¾¿ ÀĞ¾îµé¿©¼­ S ¿¡ ÀúÀå
+        'í•œì¤„ì”© ì½ì–´ë“¤ì—¬ì„œ S ì— ì €ì¥
         Line Input #fnr, S
         
-        'ÀĞ¾îµéÀÌ´Â ·¹ÄÚµå Ä«¿îÆ®
+        'ì½ì–´ë“¤ì´ëŠ” ë ˆì½”ë“œ ì¹´ìš´íŠ¸
         RecCount = RecCount + 1
 
-        '¹è¿­ S ¿¡ ÀúÀåµÈ ³»¿ëÀ» comma ±âÁØÀ¸·Î ºĞ¸®
+        'ë°°ì—´ S ì— ì €ì¥ëœ ë‚´ìš©ì„ comma ê¸°ì¤€ìœ¼ë¡œ ë¶„ë¦¬
         RecArray = Split(S, ",")
 
-        'ÄÃ·³ º¯¼ö¸í ÀúÀå ÈÄ Field ¹è¿­·Î ¹İÈ¯
+        'ì»¬ëŸ¼ ë³€ìˆ˜ëª… ì €ì¥ í›„ Field ë°°ì—´ë¡œ ë°˜í™˜
         If RecCount = 1 Then
             ResultArray(0) = S
         End If
         
-        'Á¤ÀÇµÈ Field °¹¼ö¸¦ NumCol ¿¡ ÀúÀå ÈÄ ¹İÈ¯
+        'ì •ì˜ëœ Field ê°¯ìˆ˜ë¥¼ NumCol ì— ì €ì¥ í›„ ë°˜í™˜
         If RecCount = 2 Then
             NumCol = UBound(RecArray) + 1
             For i = 1 To NumCol
@@ -186,11 +230,11 @@ Public Sub CSVImport(ByVal CSVFileName As String, _
             Next i
         End If
 
-        'µ¥ÀÌÅÍ ÆÄÀÏ Á¤º¸¸¦ ´ã°í ÀÖ´Â Ã³À½ 3¶óÀÎÀ» ÀĞÀº ÀÌÈÄ, Áï, µ¥ÀÌÅÍ °ª Ã³¸® ºÎºĞ
+        'ë°ì´í„° íŒŒì¼ ì •ë³´ë¥¼ ë‹´ê³  ìˆëŠ” ì²˜ìŒ 3ë¼ì¸ì„ ì½ì€ ì´í›„, ì¦‰, ë°ì´í„° ê°’ ì²˜ë¦¬ ë¶€ë¶„
         If RecCount > 3 Then
             NumRow = NumRow + 1
             
-            'Key ¹è¿­ Á¶ÇÕÇØ¼­ »ı¼º - MaxKeyNum ¸¸Å­ ¹İº¹
+            'Key ë°°ì—´ ì¡°í•©í•´ì„œ ìƒì„± - MaxKeyNum ë§Œí¼ ë°˜ë³µ
             For i = 0 To UBound(ColKey)
                 For j = 1 To NumCol
                     If CLng(ColKey(i)) = j And i = 0 Then
@@ -201,7 +245,7 @@ Public Sub CSVImport(ByVal CSVFileName As String, _
                 Next j
             Next i
         
-            'µ¥ÀÌÅÍ ÀúÀå
+            'ë°ì´í„° ì €ì¥
             ResultArray(NumRow) = ResultArray(NumRow) & "|" & S
             
         End If
