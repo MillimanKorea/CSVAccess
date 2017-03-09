@@ -46,3 +46,11 @@
 
 # [CSV.BAS](https://github.com/MillimanKorea/VBAUtils/blob/master/CSV.bas)
 UDF.BAS 의 sub 및 function 을 이용해서 CSV File Access 를 하는 Sample Code
+
+
+# 주의사항
++ 아래의 사항은 CSV 파일 내용에서 반드시 지켜져야 함
++ CSV 파일의 첫번째 줄은 Field 별 이름 (필수)
++ CSV 파일의 두번째 줄은 Field 별 Data type 정의 (필수)
++ CSV 파일의 세번째 줄은 Field 별 설명 (옵션)
++ CSV 파일의 네번째 줄부터 Data
