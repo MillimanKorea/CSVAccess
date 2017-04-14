@@ -17,6 +17,7 @@ Public Sub Main()
     Dim TargetKey As String
     'Dim TargetField As String
     Dim TargetField(1 To 29) As String
+    Dim TArray() As String
     
 
 '====================================================================================================================================================
@@ -81,8 +82,9 @@ Public Sub Main()
 '    JoinStr = JoinArray(ResultArray(), TSize(0))
 '    Debug.Print JoinStr
     
-    Debug.Print "# of Rows: ", ResultArray(2)
-    Debug.Print "# of Cols: ", ResultArray(3)
+
+    Debug.Print "# of Rows: ", BST_NORow(ResultArray)
+    Debug.Print "# of Cols: ", BST_NOCol(ResultArray)
     
     Debug.Print "VLookupAll", VLookupAll(TargetKey, ResultArray())
     Debug.Print "HLookupAll", HLookupAll(TargetField(8), ResultArray())

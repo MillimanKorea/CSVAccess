@@ -34,13 +34,17 @@ Public Function Lookup(ByVal TargetRow As String, SourceArray() As String, ByVal
     Dim RecArray() As String, DataArray() As String
     Dim TargetColNum As Long
     Dim TempStr As String: TempStr = ""
-    Dim Adj As Long: Adj = 10
+    Dim Adj As Long: Adj = 0
     Dim NumRow As Long
+    Dim FlagSort As String
 
-    NumRow = CLng(SourceArray(2))
+    NumRow = CLng(BST_NORow(SourceArray))
 
     '첫번째 라인 Split
-    RecArray = Split(SourceArray(0), ",")
+    RecArray = Split(SourceArray(0), "|")
+    '"Sorted" or "NotSorted"
+    FlagSort = RecArray(4)
+    RecArray = Split(RecArray(0), ",")
 
     'TargetCol 에 해당하는 컬럼의 인덱스 찾기
     For i = 0 To UBound(RecArray())
@@ -56,7 +60,7 @@ Public Function Lookup(ByVal TargetRow As String, SourceArray() As String, ByVal
         Exit Function
     End If
 
-    If SourceArray(4) = "NotSorted" Then
+    If FlagSort = "NotSorted" Then
         '순차검색
         For i = 1 + Adj To NumRow + Adj
             If SourceArray(i) <> "" Then
@@ -75,7 +79,7 @@ Public Function Lookup(ByVal TargetRow As String, SourceArray() As String, ByVal
         End If
     Else
         '이진검색
-        i = BinSearch(SourceArray, TargetRow, 11, 11 + NumRow)
+        i = BinSearch(SourceArray, TargetRow, 1, NumRow)
         RecArray = Split(SourceArray(i), "|")
         RecArray = Split(RecArray(1), ",")
         Lookup = RecArray(TargetColNum - 1)
@@ -88,17 +92,23 @@ Public Function VLookup(ByVal TargetRow As String, SourceArray() As String, ByVa
     
     Dim i As Long
     Dim RecArray() As String
-    Dim Adj As Long: Adj = 10
+    Dim Adj As Long: Adj = 0
     Dim NumRow As Long, NumCol As Long
+    Dim FlagSort As String
     
-    NumRow = CLng(SourceArray(2))
-    NumCol = CLng(SourceArray(3))
+    NumRow = CLng(BST_NORow(SourceArray))
+    NumCol = CLng(BST_NOCol(SourceArray))
     If FieldNum > NumCol Then
         Debug.Print "배열의 컬럼 갯수보다 큰 필드번호가 입력되었습니다."
         Exit Function
     End If
     
-    If SourceArray(4) = "NotSorted" Then
+    '첫번째 라인 Split
+    RecArray = Split(SourceArray(0), "|")
+    '"Sorted" or "NotSorted"
+    FlagSort = RecArray(4)
+    
+    If FlagSort = "NotSorted" Then
         '순차검색
         For i = 1 + Adj To NumRow + Adj
             If SourceArray(i) <> "" Then
@@ -116,7 +126,7 @@ Public Function VLookup(ByVal TargetRow As String, SourceArray() As String, ByVa
         End If
     Else
         '이진검색
-        i = BinSearch(SourceArray, TargetRow, 11, 11 + NumRow)
+        i = BinSearch(SourceArray, TargetRow, 1, NumRow)
         RecArray = Split(SourceArray(i), "|")
         RecArray = Split(RecArray(1), ",")
         VLookup = RecArray(FieldNum - 1)
@@ -129,13 +139,19 @@ End Function
 Public Function VLookupAll(ByVal Target As String, SourceArray() As String) As String
     
     Dim i As Long
-    Dim Adj As Long: Adj = 10
+    Dim Adj As Long: Adj = 0
     Dim RecArray() As String
     Dim NumRow As Long
+    Dim FlagSort As String
     
-    NumRow = CLng(SourceArray(2))
+    NumRow = CLng(BST_NORow(SourceArray))
     
-    If SourceArray(4) = "NotSorted" Then
+    '첫번째 라인 Split
+    RecArray = Split(SourceArray(0), "|")
+    '"Sorted" or "NotSorted"
+    FlagSort = RecArray(4)
+    
+    If FlagSort = "NotSorted" Then
         '순차검색
         For i = 1 + Adj To NumRow + Adj
             If SourceArray(i) <> "" Then
@@ -152,7 +168,7 @@ Public Function VLookupAll(ByVal Target As String, SourceArray() As String) As S
         End If
     Else
         '이진검색
-        i = BinSearch(SourceArray, Target, 11, 11 + NumRow)
+        i = BinSearch(SourceArray, Target, 1, NumRow)
         RecArray = Split(SourceArray(i), "|")
         VLookupAll = RecArray(1)
     End If
@@ -167,13 +183,14 @@ Public Function HLookupAll(ByVal Target As String, SourceArray() As String) As S
     Dim RecArray() As String, DataArray() As String
     Dim TargetColNum As Long
     Dim TempStr As String: TempStr = ""
-    Dim Adj As Long: Adj = 10
+    Dim Adj As Long: Adj = 0
     Dim NumRow As Long
     
-    NumRow = CLng(SourceArray(2))
+    NumRow = CLng(BST_NORow(SourceArray))
     
     '첫번째 라인 Split
-    RecArray = Split(SourceArray(0), ",")
+    RecArray = Split(SourceArray(0), "|")
+    RecArray = Split(RecArray(0), ",")
     
     'Target 에 해당하는 컬럼의 인덱스 찾기
     For i = 0 To UBound(RecArray())
@@ -213,6 +230,7 @@ Public Sub CSVImport(ByVal CSVFileName As String, ByRef CSVArray() As String, By
     Dim Temp As Double
     Dim NumRow As Long, NumCol As Long
     Dim ColKey() As String
+    Dim CSVHeader(4) As String
     
     
     'file number setting
@@ -224,9 +242,8 @@ Public Sub CSVImport(ByVal CSVFileName As String, ByRef CSVArray() As String, By
     If KeyColStr = "" Then KeyColStr = "1"
     ColKey = Split(KeyColStr, ",")
     
-    '데이터는 index 11 부터 넣기 시작함
-    '앞쪽 0~10 까지의 11개 공간은 배열에 대한 정보를 넣는 공간으로 사용됨
-    NumRow = 10
+    'Index 0 에 배열에 대한 정보를 넣고("|" separator 로 구분) Index 부터 Key 를 포함한 데이터를 순서대로 저장함
+    NumRow = 0
                 
     '파일 끝까지 반복해서 읽어들이기
     Do While Not EOF(fnr)
@@ -241,7 +258,7 @@ Public Sub CSVImport(ByVal CSVFileName As String, ByRef CSVArray() As String, By
 
         '컬럼 변수명 저장 후 Field 배열로 반환
         If RecCount = 1 Then
-            CSVArray(0) = S
+            CSVHeader(0) = S
         End If
         
         '정의된 Field 갯수를 NumCol 에 저장 후 반환
@@ -249,9 +266,9 @@ Public Sub CSVImport(ByVal CSVFileName As String, ByRef CSVArray() As String, By
             NumCol = UBound(RecArray) + 1
             For i = 1 To NumCol
                 If i = 1 Then
-                    CSVArray(1) = Left(RecArray(i - 1), 1)
+                    CSVHeader(1) = Left(RecArray(i - 1), 1)
                 Else
-                    CSVArray(1) = CSVArray(1) & "," & Left(RecArray(i - 1), 1)
+                    CSVHeader(1) = CSVHeader(1) & "," & Left(RecArray(i - 1), 1)
                 End If
             Next i
         End If
@@ -281,16 +298,22 @@ Public Sub CSVImport(ByVal CSVFileName As String, ByRef CSVArray() As String, By
     'file close
     Close fnr
     
-    CSVArray(2) = NumRow
-    CSVArray(3) = NumCol
+    CSVHeader(2) = NumRow
+    CSVHeader(3) = NumCol
     
     If SortFlag = 1 Then
-        CSVArray(4) = "Sorted"
-        Call QuickSort(CSVArray, 11, 11 + NumRow)
+        CSVHeader(4) = "Sorted"
+        Call QuickSort(CSVArray, 1, NumRow)
     Else
-        CSVArray(4) = "NotSorted"
+        CSVHeader(4) = "NotSorted"
     End If
     
+    CSVArray(0) = CSVHeader(0) & "|" & _
+                  CSVHeader(1) & "|" & _
+                  CSVHeader(2) & "|" & _
+                  CSVHeader(3) & "|" & _
+                  CSVHeader(4)
+
 End Sub
 
 
@@ -400,5 +423,26 @@ Function BinSearch(ByRef SrcArray() As String, ByVal Target As String, ByVal min
         BinSearch = 0
     End If
 
+End Function
+
+
+
+Public Function BST_NORow(ByRef SourceArray() As String) As Long
+
+    Dim TempArray() As String
+    
+    TempArray = Split(SourceArray(0), "|")
+    BST_NORow = CLng(TempArray(2))
+    
+End Function
+
+
+Public Function BST_NOCol(ByRef SourceArray() As String) As Long
+
+    Dim TempArray() As String
+    
+    TempArray = Split(SourceArray(0), "|")
+    BST_NOCol = CLng(TempArray(3))
+    
 End Function
 
