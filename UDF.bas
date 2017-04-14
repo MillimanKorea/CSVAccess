@@ -88,6 +88,47 @@ Public Function Lookup(ByVal TargetRow As String, SourceArray() As String, ByVal
 End Function
 
 
+Public Function LookupNum(ByVal TargetRowNum As Long, SourceArray() As String, ByVal TargetCol As String) As String
+
+    Dim i As Long
+    Dim RecArray() As String, DataArray() As String
+    Dim TargetColNum As Long
+    Dim TempStr As String: TempStr = ""
+    Dim Adj As Long: Adj = 0
+    Dim NumRow As Long
+
+    NumRow = CLng(BST_NORow(SourceArray))
+
+    '첫번째 라인 Split
+    RecArray = Split(SourceArray(0), "|")
+    RecArray = Split(RecArray(0), ",")
+
+    'TargetCol 에 해당하는 컬럼의 인덱스 찾기
+    For i = 0 To UBound(RecArray())
+        If RecArray(i) = TargetCol Then
+            TargetColNum = i + 1
+            Exit For
+        End If
+    Next i
+
+    'TargetCol 에 해당되는 필드가 존재하지 않는 경우 error message 표시 후 종료
+    If i > UBound(RecArray()) Then
+        Debug.Print TargetCol & " 에 해당하는 필드가 존재하지 않습니다."
+        Exit Function
+    End If
+
+    RecArray = Split(SourceArray(TargetRowNum + Adj), "|")
+    RecArray = Split(RecArray(1), ",")
+    LookupNum = RecArray(TargetColNum - 1)
+
+    'TargetRowNum 에 해당되는 필드가 존재하지 않는 경우 error message 표시
+    If i > NumRow + Adj Then
+        Debug.Print TargetRowNum & " 번째 레코드가 존재하지 않습니다."
+    End If
+
+End Function
+
+
 Public Function VLookup(ByVal TargetRow As String, SourceArray() As String, ByVal FieldNum As Long) As String
     
     Dim i As Long
@@ -446,3 +487,25 @@ Public Function BST_NOCol(ByRef SourceArray() As String) As Long
     
 End Function
 
+
+Public Function Dec2Str(ByRef SourceDec As Long, ByVal Dec As Long) As String
+
+    Dim i As Integer
+    Dim Div As Double
+    Dim Result As String
+    
+    Result = ""
+    
+    For i = 0 To Dec - 1
+        Div = SourceDec / (10 ^ i)
+        If i = 0 And SourceDec = 0 Then
+            Result = Result
+        ElseIf Div < 1 Then
+            Result = Result & "0"
+        End If
+    Next i
+    
+    Result = Result & SourceDec
+    Dec2Str = Result
+    
+End Function
