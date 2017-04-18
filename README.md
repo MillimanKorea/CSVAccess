@@ -58,6 +58,6 @@ UDF.BAS 의 sub 및 function 을 이용해서 CSV File Access 를 하는 Sample 
 2. **CSVImport Sub 사용시 주의 사항**
 + CSV 파일 내용을 받아오는 Array 의 Index 는 반드시 0 부터 시작해야 함
 + Index 0 에 CSV 헤더 정보를 저장함
-+ 기존에는 Index 10 까지 헤더정보 저장하였으나 배열 선언시 사이즈 지정에 혼동 및 오류을 초래할 가능성이 높아서 로직 
++ 기존에는 Index 10 까지 헤더정보 저장하였으나 배열 선언시 사이즈 지정에 혼동 및 오류을 초래할 가능성이 높아서 로직 수정 
 
 
