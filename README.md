@@ -50,14 +50,14 @@ UDF.BAS 의 sub 및 function 을 이용해서 CSV File Access 를 하는 Sample 
 
 # 주의사항
 
-1. 아래의 사항은 CSV 파일 내용에서 반드시 지켜져야 함
- + CSV 파일의 첫번째 줄은 Field 별 이름 (필수)
- + CSV 파일의 두번째 줄은 Field 별 Data type 정의 (필수)
- + CSV 파일의 세번째 줄은 Field 별 설명 (옵션)
- + CSV 파일의 네번째 줄부터 Data
-2. CSVImport Sub 사용시 주의 사항
- + CSV 파일 내용을 받아오는 Array 의 Index 는 반드시 0 부터 시작해야 함
- + Index 0 에 CSV 헤더 정보를 저장함
- + 기존에는 Index 10 까지 헤더정보 저장하였으나 배열 선언시 사이즈 지정에 혼동 및 오류을 초래할 가능성이 높아서 로직 
+1. **아래의 사항은 CSV 파일 내용에서 반드시 지켜져야 함**
++ CSV 파일의 첫번째 줄은 Field 별 이름 (필수)
++ CSV 파일의 두번째 줄은 Field 별 Data type 정의 (필수)
++ CSV 파일의 세번째 줄은 Field 별 설명 (옵션)
++ CSV 파일의 네번째 줄부터 Data
+2. **CSVImport Sub 사용시 주의 사항**
++ CSV 파일 내용을 받아오는 Array 의 Index 는 반드시 0 부터 시작해야 함
++ Index 0 에 CSV 헤더 정보를 저장함
++ 기존에는 Index 10 까지 헤더정보 저장하였으나 배열 선언시 사이즈 지정에 혼동 및 오류을 초래할 가능성이 높아서 로직 
 
 
