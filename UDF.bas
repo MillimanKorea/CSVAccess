@@ -342,12 +342,19 @@ Public Sub CSVImport(ByVal CSVFileName As String, ByRef CSVArray() As String, By
     CSVHeader(2) = NumRow
     CSVHeader(3) = NumCol
     
-    If SortFlag = 1 Then
-        CSVHeader(4) = "Sorted"
-        Call QuickSort(CSVArray, 1, NumRow)
-    Else
-        CSVHeader(4) = "NotSorted"
-    End If
+    Select Case SortFlag
+        Case 1
+            CSVHeader(4) = "Sorted"
+            Call QuickSort(CSVArray, 1, NumRow)
+        Case 2
+            CSVHeader(4) = "Sorted"
+            Call HeapSort(CSVArray, NumRow)
+        Case 3
+            CSVHeader(4) = "Sorted"
+            Call InsertionSort(CSVArray, NumRow)
+        Case Else
+            CSVHeader(4) = "NotSorted"
+    End Select
     
     CSVArray(0) = CSVHeader(0) & "|" & _
                   CSVHeader(1) & "|" & _
@@ -358,7 +365,7 @@ Public Sub CSVImport(ByVal CSVFileName As String, ByRef CSVArray() As String, By
 End Sub
 
 
-Public Sub QuickSort(ByRef SrcArray() As String, ByVal min As Integer, ByVal max As Long)
+Public Sub QuickSort(ByRef SrcArray() As String, ByVal min As Long, ByVal max As Long)
     
     Dim med_value As String
     Dim hi As Long
@@ -509,3 +516,110 @@ Public Function Dec2Str(ByRef SourceDec As Long, ByVal Dec As Long) As String
     Dec2Str = Result
     
 End Function
+
+
+Sub InsertionSort(ByRef SrcArray() As String, ByVal max As Long)
+
+    Dim lngCounter1 As Long
+    Dim lngCounter2 As Long
+    Dim varTemp As String
+
+    For lngCounter1 = 1 To max
+        
+        varTemp = SrcArray(lngCounter1)
+        
+        For lngCounter2 = lngCounter1 To 1 Step -1
+
+            If SrcArray(lngCounter2 - 1) > varTemp Then
+                SrcArray(lngCounter2) = SrcArray(lngCounter2 - 1)
+            Else
+                Exit For
+            End If
+
+        Next lngCounter2
+
+        SrcArray(lngCounter2) = varTemp
+
+    Next lngCounter1
+
+End Sub
+
+
+Public Sub HeapSort(ByRef SrcArray() As String, ByVal max As Long)
+ 
+    Dim j As String, the_end As Long
+    Dim Ascending As Boolean: Ascending = True
+ 
+    Call heapify(SrcArray, max, Ascending)
+ 
+    the_end = max
+    Do While the_end >= 1
+        j = SrcArray(the_end)
+        SrcArray(the_end) = SrcArray(1)
+        SrcArray(1) = j
+
+        the_end = the_end - 1
+
+        Call siftDown(SrcArray, 1, the_end, Ascending)
+    Loop
+ 
+End Sub
+
+
+Public Sub heapify(ByRef list() As String, ByVal count As Long, ByVal Ascending As Boolean)
+ 
+    Dim start As Long
+
+    'start = (count - 2) / 2
+    start = count / 2
+      
+    Do While start > 0
+        'Call siftDown(list, start, count - 1, Ascending)
+        Call siftDown(list, start, count, Ascending)
+        start = start - 1
+    Loop
+
+End Sub
+
+
+Public Sub siftDown(ByRef list() As String, ByVal the_start As Long, ByVal the_end As Long, ByVal Ascending As Boolean)
+ 
+    Dim k As String, root As Long, child As Long, swap As Long
+    root = the_start
+ 
+    Do While root * 2 <= the_end
+        child = root * 2
+        swap = root
+  
+        If Ascending Then
+            If list(swap) < list(child) Then
+                swap = child
+            End If
+  
+            If child + 1 <= the_end And list(swap) < list(child + 1) Then
+                swap = child + 1
+            End If
+        Else
+  
+            If list(child) < list(swap) Then
+                swap = child
+            End If
+   
+            If child + 1 <= the_end And list(child + 1) < list(swap) Then
+                swap = child + 1
+            End If
+        End If
+          
+        If swap <> root Then
+            k = list(root)
+            list(root) = list(swap)
+            list(swap) = k
+            root = swap
+        Else
+            Exit Sub
+        End If
+ 
+    Loop
+ 
+End Sub
+

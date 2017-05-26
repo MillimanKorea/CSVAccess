@@ -62,7 +62,10 @@ Public Sub Main()
 '====================================================================================================================================================
     
     
-    Call CSVImport(InputFileName, ResultArray(), KeyCol, 0)
+    For i = 0 To 3
+        Call EB_Timecheck_Start
+        Call CSVImport(InputFileName, ResultArray(), KeyCol, i)
+        Call EB_Timecheck_End("Import & Sort - ")
 '====================================================================================================================================================
     'CSVImport Sub
     'CSV data file 의 내용을 ResultArray 배열에 저장. String 속성의 배열임
@@ -72,7 +75,7 @@ Public Sub Main()
         'index 1 : 필드 속성
         'index 11~ : 데이터 레코드
     '3rd 파라미터(KeyCol) : CSV 내용 중 Key Field 의 위치를 담고 있는 변수. 콤마로 구분.
-    '4th 파라미터(SortFlag) : 배열의 Sorting 여부. 0 이면 정렬하지 않음. 1이면 정렬(QuickSort)
+    '4th 파라미터(SortFlag) : 배열의 Sorting 여부. 0 이면 정렬하지 않음. 1이면 QuickSort, 2이면 HeapSort, 3이면 InsertionSort
     '[주의] ByRef 로 처리되는 배열변수는 반드시 0 부터 인덱스 정의 필요. 그렇지 않으면 하나씩 뒤로 밀리게 됨
 '====================================================================================================================================================
     
@@ -83,16 +86,19 @@ Public Sub Main()
 '    Debug.Print JoinStr
     
 
-    Debug.Print "# of Rows: ", BST_NORow(ResultArray)
-    Debug.Print "# of Cols: ", BST_NOCol(ResultArray)
+        Debug.Print "# of Rows: ", BST_NORow(ResultArray)
+        Debug.Print "# of Cols: ", BST_NOCol(ResultArray)
+        
+        Call EB_Timecheck_Start
+        Debug.Print "VLookupAll", VLookupAll(TargetKey, ResultArray())
+        Debug.Print "HLookupAll", HLookupAll(TargetField(8), ResultArray())
     
-    Debug.Print "VLookupAll", VLookupAll(TargetKey, ResultArray())
-    Debug.Print "HLookupAll", HLookupAll(TargetField(8), ResultArray())
-
-    For j = 1 To 29
-        Debug.Print j, "VLookup", VLookup(TargetKey, ResultArray(), j)
-        Debug.Print j, "Lookup", Lookup(TargetKey, ResultArray(), TargetField(j))
-    Next j
+        For j = 1 To 29
+            Debug.Print j, "VLookup", VLookup(TargetKey, ResultArray(), j)
+            Debug.Print j, "Lookup", Lookup(TargetKey, ResultArray(), TargetField(j))
+        Next j
+        Call EB_Timecheck_End("Run-time [" & i & "] - ")
+    Next i
 
 '====================================================================================================================================================
     'VLookup Function : 반환값은 반드시 Double type
